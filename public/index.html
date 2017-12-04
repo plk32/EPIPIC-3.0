@@ -24,35 +24,34 @@
 </html>
 <script type="text/javascript" src="mylib.js"></script>
 <script>
-  let cursor = -1;
+  var cursor = -1;
   getFirstPictures(50);
   // Listen scroll
   window.onscroll = function() {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
       cursor = cursor + 50;
-      getPictures(cursor, 50);
+      //getPictures(cursor, 50);
     }
   };
 
   ///////
-  let upload = document.getElementById('upload');
+  var upload = document.getElementById('upload');
   //upload.onclick = sendPicture();
   upload.onclick = function () {
-    let xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("POST", "/api/pictures", true);
-    xmlhttp.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-    let picture = document.getElementById('picture').value;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", endpoint + "/pictures", true);
+    var picture = document.getElementById('picture').value;
     // test picture field validity
-    let test = document.createElement('img');
+    var test = document.createElement('img');
     test.setAttribute('src', picture);
     test.onerror = function() {
       xmlhttp.send(JSON.stringify({'picture' : null, 'caption' : 'none'}));
     };
     test.onload = function() {
-      let data = {
+      var data = {
         'picture' : picture,
         'caption' : document.getElementById('caption').value
-      }
+      };
       xmlhttp.send(JSON.stringify(data));
     };
   };

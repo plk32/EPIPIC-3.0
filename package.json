@@ -10,7 +10,14 @@
     "express-minify": "^0.2.0"
   },
   "scripts": {
-    "start": "node app/index.js",
-    "nodemon": "nodemon app/index.js"
+    "start": "node src/index.js",
+    "nodemon": "nodemon src/index.js",
+    "build": "npm install",
+    "predeploy": "npm run build",
+    "deploy": "aws s3 sync public/ s3://epipic-s3bucket-albqej5s18z3"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.158.0",
+    "dynamodb": "^1.0.0"
   }
 }

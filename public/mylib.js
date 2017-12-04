@@ -1,44 +1,47 @@
+const endpoint = 'https://d761zmwq6c.execute-api.eu-west-2.amazonaws.com/dev';
+
 function getFirstPictures(amount) {
   const req = new XMLHttpRequest();
-  req.open('GET', '/api/pictures?&amount=' + amount , false);
+  req.open('GET', endpoint + '/pictures?&amount=' + amount , false);
   req.send(null);
-  let json = JSON.parse(req.responseText);
+  console.log(req);
+  var json = JSON.parse(req.responseText);
   showPictures(json.pictures);
-};
+}
 
 function getPictures(cursor, amount) {
   const req = new XMLHttpRequest();
-  req.open('GET', '/api/pictures?cursor=' + cursor + "&amount=" + amount , false);
+  req.open('GET', endpoint + '/pictures?cursor=' + cursor + "&amount=" + amount , false);
   req.send(null);
-  if (req.status != 404) {
-    let json = JSON.parse(req.responseText);
+  if (req.status !== 404) {
+    var json = JSON.parse(req.responseText);
     showPictures(json.pictures);
   }
-};
+}
 
 function showPictures(pictures) {
-  let grid = document.querySelector('.grid');
-  let fragment = document.createDocumentFragment();
+  var grid = document.querySelector('.grid');
+  var fragment = document.createDocumentFragment();
 
-  for (let i = 0; i < pictures.length; i++) {
-    let cell = document.createElement('div');
-    cell.setAttribute('class', 'cell')
+  for (var i = 0; i < pictures.length; i++) {
+    var cell = document.createElement('div');
+    cell.setAttribute('class', 'cell');
 
     // Image with attributes
-    let img = document.createElement('img');
+    var img = document.createElement('img');
     img.setAttribute('src', pictures[i].picture);
     img.setAttribute('alt', pictures[i].caption);
     img.setAttribute('width', 200);
     img.setAttribute('height', 200);
 
     // Button for delete
-    let btn = document.createElement('button');
+    var btn = document.createElement('button');
     btn.innerHTML = 'X';
     btn.setAttribute('class', 'btn-delete');
     btn.onclick = function() {
       const req = new XMLHttpRequest();
       cell.parentNode.removeChild(cell);
-      req.open('DELETE', '/api/pictures/' + pictures[i].id, false);
+      req.open('DELETE', endpoint + '/pictures/' + pictures[i].id, false);
       req.send(null);
     };
 
@@ -49,7 +52,7 @@ function showPictures(pictures) {
   }
 
   grid.appendChild(fragment);
-};
+}
 
 /*function sendPicture() {
   var data = {

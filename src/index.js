@@ -1,14 +1,85 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const path = require('path');
-const fs = require('fs');
-const minify = require('express-minify');
+const AWS = require('aws-sdk');
 
-app.use(minify());
-app.use(express.static('public'));
-app.use(bodyParser.json());
+var dynamodb = new AWS.DynamoDB();
+var id = 0;
 
+exports.lambda_handler = function(event, context, callback) {
+
+  switch (event.httpMethod) {
+    case 'POST':
+      postFunction(event, context, callback);
+      break;
+    case 'GET':
+      getFunction(event, context, callback);
+      break;
+  }
+
+};
+
+const getFunction = function (event, context, callback) {
+  var response = {
+     statusCode: 200,
+     headers: {
+       "Access-Control-Allow-Headers": "*",
+       "Access-Control-Allow-Methods": "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT",
+       "Access-Control-Allow-Origin": "*"
+     },
+     body: JSON.stringify(event)
+  };
+  callback(null, response);
+};
+
+const postFunction = function (event, context, callback) {
+
+  var jsonObject = JSON.parse(Buffer.from(event['body'], 'base64').toString());
+
+  if (!jsonObject || !jsonObject.picture || !jsonObject.caption) {
+    var error = {
+      statusCode: 512,
+      body: JSON.stringify("No picture or caption added")
+    };
+    callback(null, error);
+  }
+
+  var response = null;
+  id += 1;
+
+  var params = {
+    TableName : process.env.TABLE_NAME,
+    Item: {
+      "id": {
+        S: id.toString()
+      },
+      "picture": {
+        S: jsonObject.picture
+      },
+      "caption": {
+        S: jsonObject.caption
+      }
+    },
+    ReturnConsumedCapacity: "TOTAL"
+  };
+
+  dynamodb.putItem(params, function(err, data) {
+    if (err)
+      response = {
+        statusCode: 500,
+        body: err.message
+      };
+    else
+      response = {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Allow-Methods": "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT",
+          "Access-Control-Allow-Origin": "*"
+        },
+        body: "Element ajouté !"
+      };
+    callback(null, response);
+  });
+};
+/*
 // Root sends index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
@@ -85,5 +156,5 @@ app.delete('/api/pictures/:id', (req, res) => {
 app.listen(4242, () => {
   console.log('EPIPIC listening on port 4242!');
 });
-
+*/
 //module.exports = app;
