@@ -4,9 +4,8 @@ function getFirstPictures(amount) {
   const req = new XMLHttpRequest();
   req.open('GET', endpoint + '/pictures?&amount=' + amount , false);
   req.send(null);
-  console.log(req);
-  var json = JSON.parse(req.responseText);
-  showPictures(json.pictures);
+  var pictures = JSON.parse(req.responseText);
+  showPictures(pictures);
 }
 
 function getPictures(cursor, amount) {
@@ -14,8 +13,8 @@ function getPictures(cursor, amount) {
   req.open('GET', endpoint + '/pictures?cursor=' + cursor + "&amount=" + amount , false);
   req.send(null);
   if (req.status !== 404) {
-    var json = JSON.parse(req.responseText);
-    showPictures(json.pictures);
+    var pictures = JSON.parse(req.responseText);
+    showPictures(pictures);
   }
 }
 

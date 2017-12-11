@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 
 var dynamodb = new AWS.DynamoDB();
+var docClient = new AWS.DynamoDB.DocumentClient();
 var id = 0;
 
 exports.lambda_handler = function(event, context, callback) {
@@ -17,16 +18,46 @@ exports.lambda_handler = function(event, context, callback) {
 };
 
 const getFunction = function (event, context, callback) {
-  var response = {
-     statusCode: 200,
-     headers: {
-       "Access-Control-Allow-Headers": "*",
-       "Access-Control-Allow-Methods": "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT",
-       "Access-Control-Allow-Origin": "*"
-     },
-     body: JSON.stringify(event)
+  var amount = parseInt(event.queryStringParameters.amount);
+
+  var params = {
+    TableName: process.env.TABLE_NAME,
+    Limit: amount
   };
-  callback(null, response);
+
+  var pictures = [];
+  var cursor = -1;
+  if (event.queryStringParameters.cursor !== undefined)
+    cursor = parseInt(event.queryStringParameters.cursor);
+
+  var max = cursor + amount;
+
+  docClient.scan(params, function(err, data) {
+    if (err)
+      callback(null, {
+        statusCode: 404,
+        body: JSON.stringify("No image")
+      });
+    else {
+      data.Items.forEach(function(picture) {
+        var obj = {};
+        obj.id = picture.id;
+        obj.picture = picture.picture;
+        obj.caption = picture.caption;
+        pictures.push(obj);
+      });
+    }
+    var response = {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT",
+        "Access-Control-Allow-Origin": "*"
+      },
+      body: JSON.stringify(pictures)
+    };
+    callback(null, response);
+  });
 };
 
 const postFunction = function (event, context, callback) {
