@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Wip for launch on aws ec2
+AWS_CONFIG_FILE=/root/.aws/credentials
+
 STAGE=${1:-dev}
 PROJECT=epipic
 
