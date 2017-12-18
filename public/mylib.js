@@ -1,4 +1,4 @@
-const endpoint = 'https://d761zmwq6c.execute-api.eu-west-2.amazonaws.com/dev';
+const endpoint = 'https://w12g9zyh6h.execute-api.eu-west-2.amazonaws.com/dev';
 
 function getFirstPictures(amount) {
   const req = new XMLHttpRequest();
